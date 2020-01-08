@@ -2,19 +2,23 @@ package com.dfedonnikov.rates.ui
 
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dfedonnikov.rates.App
 import com.dfedonnikov.rates.R
 import com.hannesdorfmann.mosby3.mvp.MvpActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MainActivity : MvpActivity<RatesView, RatesPresenter>(), RatesView {
 
+    @Inject
+    lateinit var ratesPresenter: RatesPresenter
+
     private lateinit var adapter: RatesAdapter
 
-    override fun createPresenter(): RatesPresenter {
-        return RatesPresenter()
-    }
+    override fun createPresenter(): RatesPresenter = ratesPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as App).component.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initRatesList()

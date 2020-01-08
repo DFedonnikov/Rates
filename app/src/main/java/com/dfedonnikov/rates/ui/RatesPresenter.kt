@@ -3,8 +3,9 @@ package com.dfedonnikov.rates.ui
 import com.dfedonnikov.rates.R
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter
 import java.util.*
+import javax.inject.Inject
 
-class RatesPresenter : MvpBasePresenter<RatesView>() {
+class RatesPresenter @Inject constructor() : MvpBasePresenter<RatesView>() {
 
     private var list = LinkedList<RateItem>()
 

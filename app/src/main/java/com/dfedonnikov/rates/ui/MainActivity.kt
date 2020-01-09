@@ -1,6 +1,7 @@
 package com.dfedonnikov.rates.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dfedonnikov.rates.App
 import com.dfedonnikov.rates.R
@@ -35,5 +36,9 @@ class MainActivity : MvpActivity<RatesView, RatesPresenter>(), RatesView {
 
     override fun renderRates(list: List<RateItem>) {
         adapter.submitList(list)
+    }
+
+    override fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

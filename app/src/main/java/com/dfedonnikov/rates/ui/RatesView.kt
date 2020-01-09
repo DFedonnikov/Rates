@@ -5,4 +5,5 @@ import com.hannesdorfmann.mosby3.mvp.MvpView
 interface RatesView: MvpView {
 
     fun renderRates(list: List<RateItem>)
+    fun showError(message: String)
 }

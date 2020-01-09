@@ -1,4 +1,4 @@
-package com.dfedonnikov.rates.model
+package com.dfedonnikov.rates.data
 
 import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal

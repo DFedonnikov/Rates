@@ -9,10 +9,13 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.dfedonnikov.rates.R
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.rate_item.*
 import java.util.regex.Pattern
+import com.dfedonnikov.rates.R
+
+
+
 
 class RatesAdapter(private val clickListener: (item: RateItem) -> Unit,
                    private val inputChangeListener: (item: RateItem) -> Unit) :
@@ -61,7 +64,7 @@ class RatesAdapter(private val clickListener: (item: RateItem) -> Unit,
             rateTitle.text = item.title
             rateSubtitle.text = item.subtitle
             val isItemCompletelyChanged = payloads.firstOrNull() as? Boolean ?: true
-            if (item.amount != "0" && (position != 0 || isItemCompletelyChanged)) {
+            if (position != 0 || isItemCompletelyChanged) {
                 amount.setText(item.amount)
             }
             if (isItemCompletelyChanged) {
@@ -69,7 +72,6 @@ class RatesAdapter(private val clickListener: (item: RateItem) -> Unit,
             }
             isBinding = false
         }
-
     }
 }
 
@@ -95,8 +97,8 @@ class DecimalDigitsFilter : InputFilter {
 
         val replacement = source.subSequence(start, end).toString()
         val newVal =
-            dest.subSequence(0, dstart).toString() + replacement + dest.subSequence(dend, dest.length).toString();
-        val matcher = pattern.matcher(newVal);
+            dest.subSequence(0, dstart).toString() + replacement + dest.subSequence(dend, dest.length).toString()
+        val matcher = pattern.matcher(newVal)
         if (matcher.matches()) return null
 
         return when {
@@ -107,6 +109,6 @@ class DecimalDigitsFilter : InputFilter {
 
 
     companion object {
-        private val pattern = Pattern.compile("-?[0-9]{0,100}+((\\.[0-9]{0,2})?)||(\\.)?")
+        private val pattern = Pattern.compile("-?[0-9]{0,100}+((\\.[0-9]{0,2})?)|(\\.)?")
     }
 }

@@ -12,18 +12,19 @@ import javax.inject.Inject
 
 interface RatesRepository {
 
-    fun getLastRates(): Observable<RatesState>
+    fun getLastRatesState(): Observable<RatesState>
     fun updateRates(base: String): Single<RatesData>
     fun getState(): RatesState?
     fun updateState(ratesState: RatesState)
+    fun refresh()
 }
 
 class RatesRepositoryImpl @Inject constructor(private val api: RatesService) : RatesRepository {
 
-    private val ratesSubject = BehaviorSubject.create<RatesState>()
+    private var ratesSubject = BehaviorSubject.create<RatesState>()
     private var ratesState: RatesState? = null
 
-    override fun getLastRates(): Observable<RatesState> = ratesSubject
+    override fun getLastRatesState(): Observable<RatesState> = ratesSubject
 
     override fun updateRates(base: String): Single<RatesData> = getRates(base).doOnError { ratesSubject.onError(it) }
 
@@ -51,4 +52,7 @@ class RatesRepositoryImpl @Inject constructor(private val api: RatesService) : R
         ratesSubject.onNext(ratesState)
     }
 
+    override fun refresh() {
+        ratesSubject = BehaviorSubject.create<RatesState>()
+    }
 }

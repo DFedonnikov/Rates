@@ -7,15 +7,18 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposables
+import java.math.BigDecimal
 import javax.inject.Inject
 
 class RatesPresenter @Inject constructor(private val interactor: RatesInteractor) : MvpBasePresenter<RatesView>() {
 
     private val compositeDisposable = CompositeDisposable()
+    private var updateDisposable = Disposables.disposed()
 
     fun init() {
-        val disposable = interactor.getRates().renderRates()
-        compositeDisposable.add(disposable)
+        updateDisposable = interactor.getLatestRatesState().renderRates()
+        compositeDisposable.add(updateDisposable)
     }
 
 
@@ -23,19 +26,30 @@ class RatesPresenter @Inject constructor(private val interactor: RatesInteractor
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
             { items -> ifViewAttached { it.renderRates(items) } },
-            { ifViewAttached { it.showError("Could not load rates") } })
+            { ifViewAttached { it.showError("Could not load rates. Pull to refresh") } })
 
     private fun build(state: RatesState): List<RateItem> {
-        return state.getRates().map {
+        return state.getRates().map { stateItem ->
             RateItem(
-                title = it.currency.title,
-                subtitle = it.currency.subtitle,
-                amount = it.amount.toPlainString(),
-                icon = it.currency.icon
+                title = stateItem.currency.title,
+                subtitle = stateItem.currency.subtitle,
+                amount = stateItem.amount.takeIf { it != BigDecimal.ZERO }?.toPlainString() ?: "",
+                icon = stateItem.currency.icon
             )
         }
     }
 
+    fun refresh() {
+        if (!updateDisposable.isDisposed) {
+            updateDisposable.dispose()
+        }
+        interactor.refresh()
+        init()
+    }
+
+    fun onResume() = interactor.startRatesUpdating()
+
+    fun onPause() = interactor.stopRatesUpdating()
 
     override fun destroy() {
         super.destroy()
@@ -46,6 +60,6 @@ class RatesPresenter @Inject constructor(private val interactor: RatesInteractor
     fun onItemClicked(item: RateItem) = interactor.changeBase(item)
 
 
-    fun onInputChanged(item: RateItem) = interactor.recalculatedRates(item.amount)
+    fun onInputChanged(item: RateItem) = interactor.recalculateRates(item.amount)
 
 }
